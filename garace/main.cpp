@@ -27,24 +27,30 @@ int main(int argc, int args)
 	while(true)
 	{
 		CreateInitialPopulation(INITIAL_POP_SIZE, CANDIDATE_SIZE);
+
+		// Select the candidates from which we will breed the next generation
 		char** breeding_pool = PerformSelection();
 		for(int i = 0; i < BREEDING_POOL_SIZE; i += 2)
 		{
+			// Breed the next generation. Each breeding pair replaces itself with 2 new candidates
 			PerformCrossover(breeding_pool[i], breeding_pool[i+1]);
 			PerformMutation(breeding_pool[i]);
 			PerformMutation(breeding_pool[i+1]);
 		}
 
-		delete breeding_pool;
-		PrintBest();
+		// Cleanup the breeding pool pointers
+		// Note this was an array of pointers, we only want to discard the -pointers-, not the data pointed to
+		// The data pointed to is still referenced and owned by the population array
+		delete [] breeding_pool;
 
+		PrintBest();	// Print the best candidate from the current generation, includes the newly breds.
+
+		// Check for full evolution, we have bred a matching string!
 		if (TestForEnd() == true)
 		{
 			break;
 		}
 	}
-
-
 	return 0;
 }
 
