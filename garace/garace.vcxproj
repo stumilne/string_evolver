@@ -75,6 +75,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="string_evolver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="string_evolver.h" />

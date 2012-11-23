@@ -1,4 +1,4 @@
-#include <string>
+/*#include <string>
 #include <iostream>>
 #include <vector>
 #include <algorithm>
@@ -21,9 +21,17 @@ void PerformCrossover(char *, char *);
 void PerformMutation(char *);
 void PrintBest();				// Prints best individual of current population
 bool TestForEnd();				// Tests if any member of the population is 'perfect', ie. matches fully evolved example
+*/
+#include <iostream>>
+#include <time.h>
+#include "string_evolver.h"
+
+using std::cout;
+using std::endl;
+using std::cin;
 
 int main(int argc, int args)
-{
+{/*
 	while(true)
 	{
 		CreateInitialPopulation(INITIAL_POP_SIZE, CANDIDATE_SIZE);
@@ -50,10 +58,25 @@ int main(int argc, int args)
 		{
 			break;
 		}
+	}*/
+	srand(time(NULL));
+	StringEvolver evolver("Greg likes ruby!", 1000);
+	while(!evolver.IsFullyEvolved())
+	{
+		evolver.AdvanceGeneration();
+		if(evolver.GetGenerationCount() % 10 == 0)
+		{
+		cout << "Generation " << evolver.GetGenerationCount() << " best candidate is " << evolver.GetFittest() <<
+			" with fitness " << evolver.GetBestFitness() << endl;
+	
+		}
 	}
+	cout << "Evolution complete! " << evolver.GetFittest() << " found in " << evolver.GetGenerationCount() << " generations!" << endl;
+	cin.get();
+
 	return 0;
 }
-
+/*
 void CreateInitialPopulation(const int amount, const int size)
 {
 	for(int i = 0; i < amount; ++i)
@@ -156,4 +179,4 @@ void PrintBest()
 		}
 	}
 	cout << "Best so far: " << best << " Has fitness: " << best_so_far << endl;
-}
+}//*/
