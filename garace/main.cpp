@@ -46,13 +46,13 @@ int main(int argc, char *argv[])
 		// Print best candidate info. every 10 generations
 		if(evolver.GetGenerationCount() % 10 == 0)
 		{
-		cout << "Generation " << evolver.GetGenerationCount() << " best candidate is " << evolver.GetFittest() <<
-			" with fitness " << evolver.GetBestFitness() << endl;
+		cout << "Generation " << evolver.GetGenerationCount() << "- Best candidate: \"" << evolver.GetFittest() <<
+			"\" Fitness: " << evolver.GetBestFitness() << "." << endl;
 	
 		}
 	}
 	// Evolution complete!
-	cout << "Evolution complete! " << evolver.GetFittest() << " found in " << evolver.GetGenerationCount() << " generations!" << endl;
+	cout << "Evolution complete! \"" << evolver.GetFittest() << "\" found in " << evolver.GetGenerationCount() << " generations." << endl;
 	cout << "Press return to exit" << endl;
 	cin.get();
 
