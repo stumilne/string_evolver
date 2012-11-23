@@ -75,10 +75,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="hirestimer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="string_evolver.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="hirestimer.h" />
+    <ClInclude Include="itimer.h" />
     <ClInclude Include="string_evolver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

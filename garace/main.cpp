@@ -1,6 +1,7 @@
 #include <iostream>
 #include <time.h>
 #include "string_evolver.h"
+#include "hirestimer.h"
 
 using std::cout;
 using std::endl;
@@ -14,6 +15,8 @@ int main(int argc, char *argv[])
 	char *string_to_evolve = nullptr;
 	int population_size = DEFAULT_POPULATION_SIZE;
 
+	stu::HiResTimer timer;
+
 	// First argument if present is the string to evolve to
 	if(argc > 1)
 	{
@@ -22,7 +25,7 @@ int main(int argc, char *argv[])
 		strcpy_s(string_to_evolve, str_length, argv[1]);
 
 		// Second argument if present is the population size
-		if(argc == 2)
+		if(argc == 3)
 		{
 			population_size = atoi(argv[2]);
 		}
@@ -34,10 +37,12 @@ int main(int argc, char *argv[])
 		strcpy_s(string_to_evolve, str_length, DEFAULT_EVOLUTION_TARGET);
 	}
 
-	srand(static_cast<int>( time(NULL) ));	// Seed random number generator
+	//srand(static_cast<int>( time(NULL) ));	// Seed random number generator
 
 	StringEvolver evolver(string_to_evolve, population_size);
 
+	timer.Reset();
+	timer.Start();
 	// Start the genetic algorithm!
 	while(!evolver.IsFullyEvolved())
 	{
@@ -51,8 +56,10 @@ int main(int argc, char *argv[])
 	
 		}
 	}
+	timer.Stop();
 	// Evolution complete!
 	cout << "Evolution complete! \"" << evolver.GetFittest() << "\" found in " << evolver.GetGenerationCount() << " generations." << endl;
+	cout << "Evolution took " << timer.GetElapsedTimeMillisecondsAsDouble() << "ms." << endl;
 	cout << "Press return to exit" << endl;
 	cin.get();
 

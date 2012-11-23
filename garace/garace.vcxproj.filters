@@ -21,9 +21,18 @@
     <ClCompile Include="string_evolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="hirestimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="string_evolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hirestimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="itimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
