@@ -19,10 +19,10 @@ StringEvolver::~StringEvolver()
 
 void StringEvolver::AdvanceGeneration()
 {
-	// Partially sort population so breeders
+	// Partially sort population so breeders are at front
 	std::partial_sort(mPopulation.begin(), mPopulation.begin() + mPopulation.size()/5 /*mBreederCount*/, mPopulation.end());
 	// Breed in pairs
-	for(int i = 0; i < mPopulation.size()/5; i += 2)
+	for(unsigned int i = 0; i < mPopulation.size()/5; i += 2)
 	{
 		PerformCrossover(&mPopulation[i], &mPopulation[i+1]);
 	}
@@ -55,14 +55,7 @@ void StringEvolver::InitialisePopulation()
 		}
 		CalculateFitness(&(*it));
 	}
-	//Ensure every letter in goal word is present at least once in seed population
-	for(int i = 0; i < mGoal.size(); ++i)
-	{
-		int random_candidate = rand() % mPopulation.size();
-		int random_index = rand() % mGoal.size();
-		mPopulation[random_candidate].str[random_index] = mGoal[i];
-	}
-	// Put the fittest initial candidate at the front
+	// Put the fittest initial candidate at the front - so we can easily GetFittest()
 	partial_sort(mPopulation.begin(), mPopulation.begin() + 1, mPopulation.end());
 }
 
@@ -73,19 +66,11 @@ void StringEvolver::PerformCrossover(Candidate *mum, Candidate *dad)
 	char *temp = new char[mGoal.size()];
 	temp[crossover_point + 1] = '\0';
 
-	if(rand() % 100 > 50)
-	{
-		// Swap everything to left of crossover point between mum and dad
-		memcpy(temp, mum->str, crossover_point);
-		memcpy(mum->str, dad->str, crossover_point);
-		memcpy(dad->str, temp, crossover_point);
-	} else
-	{
-		// Swap everything to the right of crossover point
-		memcpy(temp, mum->str + crossover_point, mGoal.size() - crossover_point);
-		memcpy(mum->str + crossover_point, dad->str + crossover_point, mGoal.size() - crossover_point);
-		memcpy(dad->str + crossover_point, temp, mGoal.size() - crossover_point);
-	}
+	// Swap everything to left of crossover point between mum and dad
+	memcpy(temp, mum->str, crossover_point);
+	memcpy(mum->str, dad->str, crossover_point);
+	memcpy(dad->str, temp, crossover_point);
+
 	delete [] temp;
 
 	// Calculate the fitness of these evolved children

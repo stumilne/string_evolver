@@ -9,14 +9,15 @@
 class StringEvolver
 {
 	typedef unsigned int uint;
+
 	// Internal data-type for storing population members
 	struct Candidate
 	{
 		Candidate() : str(nullptr), fitness(INT_MAX) {}
-		//~Candidate() { if(str) delete [] str;}
+		//~Candidate() { if(str != nullptr) delete [] str;} // TODO - cleanup corrupts the heap..
 		char *str;
 		int fitness;
-		inline bool operator < (const Candidate& other) const { return fitness < other.fitness; }
+		inline bool operator < (const Candidate& other) const { return fitness < other.fitness; }	// For stl sorting
 	};
 
 public:
@@ -30,12 +31,12 @@ public:
 	const std::string GetFittest() const;		// Returns the candidate with the best fitness - the most evolved
 	const int GetBestFitness() const;
 	inline int GetGenerationCount() { return mGenerationCount; }
-	inline char *GetPopulation() { return mPopulation[0].str; }
+	inline char *GetPopulation()	{ return mPopulation[0].str; }
 
 private:
 	void InitialisePopulation();
 	void PerformCrossover(Candidate *mother, Candidate *father);
-	void PerformMutation();
+	void PerformMutation();	
 	void CalculateFitness(Candidate *);		// Calculates the current fitness of the candidate and stores it
 	
 	std::vector<Candidate> mPopulation;
