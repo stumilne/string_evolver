@@ -20,7 +20,11 @@ StringEvolver::~StringEvolver()
 void StringEvolver::AdvanceGeneration()
 {
 	// Partially sort population so breeders are at front
-	std::partial_sort(mPopulation.begin(), mPopulation.begin() + mPopulation.size()/5 /*mBreederCount*/, mPopulation.end());
+	std::partial_sort(mPopulation.begin(), mPopulation.begin() + mPopulation.size()/5, mPopulation.end());
+	// Shuffle breeders to ensure breeding pairs are unique each generation
+	// Slows down evolution horrendously -- prevents best individuals breeding with each other, best 20% breeds randomly
+	//std::random_shuffle(mPopulation.begin()  + 1, mPopulation.begin() + mPopulation.size()/5);
+	
 	// Breed in pairs
 	for(unsigned int i = 0; i < mPopulation.size()/5; i += 2)
 	{

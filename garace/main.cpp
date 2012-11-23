@@ -6,7 +6,7 @@ using std::cout;
 using std::endl;
 using std::cin;
 
-const char *DEFAULT_EVOLUTION_TARGET = "I love genetic algorithms! =)";
+const char *DEFAULT_EVOLUTION_TARGET = "Hello, world";
 const int DEFAULT_POPULATION_SIZE = 10000;
 
 int main(int argc, char *argv[])
