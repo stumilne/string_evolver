@@ -1,5 +1,6 @@
 #include <iostream>
 #include <time.h>
+#include <string>
 #include "string_evolver.h"
 #include "hirestimer.h"
 
@@ -41,6 +42,8 @@ int main(int argc, char *argv[])
 
 	StringEvolver evolver(string_to_evolve, population_size);
 
+	std::string best_initial_candidate = evolver.GetFittest();
+
 	timer.Reset();
 	timer.Start();
 	// Start the genetic algorithm!
@@ -59,6 +62,7 @@ int main(int argc, char *argv[])
 	timer.Stop();
 	// Evolution complete!
 	cout << "Evolution complete! \"" << evolver.GetFittest() << "\" found in " << evolver.GetGenerationCount() << " generations." << endl;
+	cout << "Best initial candidate was " << best_initial_candidate << endl;
 	cout << "Evolution took " << timer.GetElapsedTimeMillisecondsAsDouble() << "ms." << endl;
 	cout << "Press return to exit" << endl;
 	cin.get();
