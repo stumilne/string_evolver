@@ -33,6 +33,9 @@ public:
 	inline int GetGenerationCount() { return mGenerationCount; }
 	inline char *GetPopulation()	{ return mPopulation[0].str; }
 
+	void SetCrossoverProbability(const float p);	// Normalised 0 - 1. 0.01f == 1% probability
+	void SetMutationProbability(const float p);
+
 private:
 	
 	void InitialisePopulation();
@@ -49,6 +52,9 @@ private:
 	std::vector<Candidate> mPopulation;
 	std::string mGoal;						// The evolutionary goal, this is what we are trying to evolve to
 	int mGenerationCount;					// How many generations have passed since initial state
+
+	float mCrossoverProbability;
+	float mMutationProbability;
 
 	typedef std::vector<Candidate>::iterator popIter;
 };

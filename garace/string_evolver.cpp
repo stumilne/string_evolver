@@ -4,13 +4,16 @@
 #include <cassert>
 //#define RANDOM_VALID_ELEMENT (rand() % 26) + 65;		// Valid ASCII code's for candidate elements
 #define RANDOM_VALID_ELEMENT (rand() % 94) + 32;		// Valid ASCII code's for candidate elements
+const int COST_PER_LETTER_MISMATCH = 94;				// Fitness cost when incorrect number of letters
 
 StringEvolver::StringEvolver(const std::string &theGoal, const uint thePopulationSize )
-	: mGoal(theGoal), mGenerationCount(0)
+	: mGoal(theGoal), mGenerationCount(0), mCrossoverProbability(1.0f), mMutationProbability(0.01f)
 {
 	mPopulation.reserve(thePopulationSize);
 	mPopulation.resize(thePopulationSize);
-	InitialisePopulation();	
+	InitialisePopulation();
+	// Partially sort population so breeders are at front for next breeding pass
+	std::partial_sort(mPopulation.begin(), mPopulation.begin() + mPopulation.size()/5, mPopulation.end());
 }
 
 StringEvolver::~StringEvolver()
@@ -21,17 +24,21 @@ StringEvolver::~StringEvolver()
 void StringEvolver::AdvanceGeneration()
 {
 	PerformMutation();
-	// Partially sort population so breeders are at front
+	// Breed in pairs
+	for(unsigned int i = 0; i < mPopulation.size()/5; i += 2)
+	{
+		if((rand() % 100) < static_cast<int>(mCrossoverProbability * 100.0f))
+		{
+			PerformMultipleCrossover(&mPopulation[i], &mPopulation[i+1]);
+			CalculateFitness(&mPopulation[i]);
+		}
+	}
+
+	// Partially sort population so breeders are at front for next breeding pass
 	std::partial_sort(mPopulation.begin(), mPopulation.begin() + mPopulation.size()/5, mPopulation.end());
 	// Shuffle breeders to ensure breeding pairs are unique each generation
 	// Slows down evolution horrendously -- prevents best individuals breeding with each other, best 20% breeds randomly
 	//std::random_shuffle(mPopulation.begin()  + 1, mPopulation.begin() + mPopulation.size()/5);
-	// Breed in pairs
-	for(unsigned int i = 0; i < mPopulation.size()/5; i += 2)
-	{
-		PerformCutSpliceCrossover(&mPopulation[i], &mPopulation[i+1]);
-		CalculateFitness(&mPopulation[i]);
-	}
 
 	mGenerationCount++;
 }
@@ -172,7 +179,7 @@ void StringEvolver::PerformMutation()
 	// 1 % chance of mutation on any candidate
 	for(popIter it = mPopulation.begin(); it != mPopulation.end(); ++it)
 	{
-		if((rand() % 100) == 1)
+		if((rand() % 100) < static_cast<int>(mMutationProbability * 100.0f))
 		{
 			ApplyMutation(&(*it));
 		}
@@ -185,6 +192,7 @@ void StringEvolver::ApplyMutation( Candidate *individual )
 
 	const int random_part = rand() % strlen(individual->str);
 	individual->str[random_part] = RANDOM_VALID_ELEMENT;
+	CalculateFitness(individual);
 }
 
 void StringEvolver::CalculateFitness(Candidate *candidate )
@@ -203,7 +211,7 @@ void StringEvolver::CalculateFitness(Candidate *candidate )
 
 	// Add a cost for incorrect amount of letters
 	int letter_mismatch = std::abs(static_cast<int>(mGoal.size()) - candidate_size);
-	distance += letter_mismatch * 94; 
+	distance += letter_mismatch * COST_PER_LETTER_MISMATCH; 
 	
 	candidate->fitness = distance;
 }
@@ -211,4 +219,18 @@ void StringEvolver::CalculateFitness(Candidate *candidate )
 const int StringEvolver::GetBestFitness() const
 {
 	return mPopulation[0].fitness;
+}
+
+void StringEvolver::SetCrossoverProbability( const float p )
+{
+	assert(p > 0.0f);
+
+	(p > 1.0f) ? mCrossoverProbability = 1.0f : mCrossoverProbability = p;
+}
+
+void StringEvolver::SetMutationProbability( const float p )
+{
+	assert(p > 0.0f);
+
+	(p > 1.0f) ? mMutationProbability = 1.0f : mMutationProbability = p;
 }
