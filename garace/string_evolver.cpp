@@ -29,7 +29,7 @@ void StringEvolver::AdvanceGeneration()
 	// Breed in pairs
 	for(unsigned int i = 0; i < mPopulation.size()/5; i += 2)
 	{
-		PerformMultipleCrossover(&mPopulation[i], &mPopulation[i+1]);
+		PerformCutSpliceCrossover(&mPopulation[i], &mPopulation[i+1]);
 		CalculateFitness(&mPopulation[i]);
 	}
 
@@ -127,9 +127,12 @@ void StringEvolver::PerformCutSpliceCrossover( Candidate *mum, Candidate *dad )
 
 	const int size_of_mum = strlen(mum->str);
 	const int size_of_dad = strlen(dad->str);
+
+	assert(size_of_mum > 0 && size_of_dad > 0);
+
 	// Random crossover point for each breeder - this is also equal to size of everything to left of this point in bytes
-	const int crossover_mum = rand() % size_of_mum - 1;
-	const int crossover_dad = rand() % size_of_dad - 1;
+	const int crossover_mum = rand() % (size_of_mum - 1);
+	const int crossover_dad = rand() % (size_of_dad - 1);
 
 	// Allocate space for the children - they are likely to change length after crossover
 	// Child is made up of left of one parent and right of other, crossover part is left part
@@ -140,6 +143,7 @@ void StringEvolver::PerformCutSpliceCrossover( Candidate *mum, Candidate *dad )
 
 	char *first_child = new char[size_of_first_child + 1];
 	char *second_child = new char[size_of_second_child + 1];
+	
 	// Null terminate!
 	first_child[size_of_first_child] = '\0';
 	second_child[size_of_second_child] = '\0';
@@ -150,6 +154,9 @@ void StringEvolver::PerformCutSpliceCrossover( Candidate *mum, Candidate *dad )
 
 	memcpy(second_child, mum->str, crossover_mum);
 	memcpy(second_child + crossover_mum, dad->str + crossover_dad, dad_right);
+
+	assert(strlen(first_child) == size_of_first_child);
+	assert(strlen(second_child) == size_of_second_child);
 
 	// Add children to population by swapping them in for their parents
 	std::swap(dad->str, first_child);
