@@ -8,7 +8,7 @@ using std::cout;
 using std::endl;
 using std::cin;
 
-const char *DEFAULT_EVOLUTION_TARGET = "Hello, world";
+const char *DEFAULT_EVOLUTION_TARGET = "Hello, world. Did you know a quick brown fox jumped over the lazy dog!? Multiple is faster! By a lot? Probably!";
 const int DEFAULT_POPULATION_SIZE = 10000;
 
 int main(int argc, char *argv[])

@@ -34,9 +34,16 @@ public:
 	inline char *GetPopulation()	{ return mPopulation[0].str; }
 
 private:
+	
 	void InitialisePopulation();
+	
 	void PerformCrossover(Candidate *mother, Candidate *father);
+	void PerformMultipleCrossover(Candidate *mother, Candidate *father);
+	void PerformCutSpliceCrossover(Candidate *mother, Candidate *father);
+	
 	void PerformMutation();	
+	void ApplyMutation(Candidate *individual);
+	
 	void CalculateFitness(Candidate *);		// Calculates the current fitness of the candidate and stores it
 	
 	std::vector<Candidate> mPopulation;

@@ -1,6 +1,7 @@
 #include "string_evolver.h"
 #include <algorithm>
 #include <cmath>
+#include <cassert>
 //#define RANDOM_VALID_ELEMENT (rand() % 26) + 65;		// Valid ASCII code's for candidate elements
 #define RANDOM_VALID_ELEMENT (rand() % 94) + 32;		// Valid ASCII code's for candidate elements
 
@@ -19,18 +20,18 @@ StringEvolver::~StringEvolver()
 
 void StringEvolver::AdvanceGeneration()
 {
+	PerformMutation();
 	// Partially sort population so breeders are at front
 	std::partial_sort(mPopulation.begin(), mPopulation.begin() + mPopulation.size()/5, mPopulation.end());
 	// Shuffle breeders to ensure breeding pairs are unique each generation
 	// Slows down evolution horrendously -- prevents best individuals breeding with each other, best 20% breeds randomly
 	//std::random_shuffle(mPopulation.begin()  + 1, mPopulation.begin() + mPopulation.size()/5);
-	
 	// Breed in pairs
 	for(unsigned int i = 0; i < mPopulation.size()/5; i += 2)
 	{
-		PerformCrossover(&mPopulation[i], &mPopulation[i+1]);
+		PerformMultipleCrossover(&mPopulation[i], &mPopulation[i+1]);
+		CalculateFitness(&mPopulation[i]);
 	}
-	PerformMutation();
 
 	mGenerationCount++;
 }
@@ -65,9 +66,13 @@ void StringEvolver::InitialisePopulation()
 
 void StringEvolver::PerformCrossover(Candidate *mum, Candidate *dad)
 {
+	assert(mum != nullptr && dad != nullptr);
+	assert(mum->str != nullptr && dad->str != nullptr);
+	assert(strlen(mum->str) == strlen(dad->str));
+
 	// Crossover point is at least a quarter from end
-	int crossover_point = rand() % (mGoal.size() - 1);
-	char *temp = new char[mGoal.size()];
+	const int crossover_point = rand() % (strlen(mum->str) - 1);
+	char *temp = new char[mGoal.length()];
 	temp[crossover_point + 1] = '\0';
 
 	// Swap everything to left of crossover point between mum and dad
@@ -82,6 +87,79 @@ void StringEvolver::PerformCrossover(Candidate *mum, Candidate *dad)
 	CalculateFitness(mum);
 }
 
+void StringEvolver::PerformMultipleCrossover( Candidate *mum, Candidate *dad )
+{
+	assert(mum != nullptr && dad != nullptr);
+	assert(mum->str != nullptr && dad->str != nullptr);
+	assert(strlen(mum->str) == strlen(dad->str));
+
+	// Two random points within genome
+	int crossover_start = rand() % (strlen(mum->str) - 1);
+	int crossover_end = rand() % (strlen(mum->str));
+
+	// Ensure start is first
+	(crossover_start > crossover_end) ? std::swap(crossover_start, crossover_end) : 0;
+	const size_t bytes_to_cross = crossover_end - crossover_start;
+
+	char *mum_start = mum->str + crossover_start;
+	char *dad_start = dad->str + crossover_start; 
+
+	assert(strlen(mum_start) == strlen(dad_start));
+
+	// Swap everything between crossover points
+	char *temp = new char[bytes_to_cross];
+
+	memcpy(temp, mum_start, bytes_to_cross);
+	memcpy(mum_start, dad_start, bytes_to_cross);
+	memcpy(dad_start, temp, bytes_to_cross);
+
+	delete [] temp;
+
+	// Calculate the fitness of these evolved children
+	CalculateFitness(dad);
+	CalculateFitness(mum);
+}
+
+void StringEvolver::PerformCutSpliceCrossover( Candidate *mum, Candidate *dad )
+{
+	assert(mum != nullptr && dad != nullptr);
+	assert(mum->str != nullptr && dad->str != nullptr);
+
+	const int size_of_mum = strlen(mum->str);
+	const int size_of_dad = strlen(dad->str);
+	// Random crossover point for each breeder - this is also equal to size of everything to left of this point in bytes
+	const int crossover_mum = rand() % size_of_mum - 1;
+	const int crossover_dad = rand() % size_of_dad - 1;
+
+	// Allocate space for the children - they are likely to change length after crossover
+	// Child is made up of left of one parent and right of other, crossover part is left part
+	const size_t mum_right = size_of_mum - crossover_mum;	// Size of part to the right of crossover point
+	const size_t dad_right = size_of_dad - crossover_dad;
+	const size_t size_of_first_child = crossover_dad + mum_right;
+	const size_t size_of_second_child = crossover_mum + dad_right;
+
+	char *first_child = new char[size_of_first_child + 1];
+	char *second_child = new char[size_of_second_child + 1];
+	// Null terminate!
+	first_child[size_of_first_child] = '\0';
+	second_child[size_of_second_child] = '\0';
+
+	// Create children by splicing in respective parts of parents
+	memcpy(first_child, dad->str, crossover_dad);		// First part of first child made up of everything to left of father crossover point
+	memcpy(first_child + crossover_dad, mum->str + crossover_mum, mum_right);
+
+	memcpy(second_child, mum->str, crossover_mum);
+	memcpy(second_child + crossover_mum, dad->str + crossover_dad, dad_right);
+
+	// Add children to population by swapping them in for their parents
+	std::swap(dad->str, first_child);
+	std::swap(mum->str, second_child);
+
+	// Cleanup parents (have been swapped into children pointers)
+	delete [] first_child;
+	delete [] second_child;
+}
+
 void StringEvolver::PerformMutation()
 {
 	// 1 % chance of mutation on any candidate
@@ -89,11 +167,17 @@ void StringEvolver::PerformMutation()
 	{
 		if((rand() % 100) == 1)
 		{
-			const int random_part = rand() % mGoal.size();
-			it->str[random_part] = RANDOM_VALID_ELEMENT;
-			CalculateFitness(&(*it));
+			ApplyMutation(&(*it));
 		}
 	}
+}
+
+void StringEvolver::ApplyMutation( Candidate *individual )
+{
+	assert(individual != nullptr && individual->str != nullptr);
+
+	const int random_part = rand() % strlen(individual->str);
+	individual->str[random_part] = RANDOM_VALID_ELEMENT;
 }
 
 void StringEvolver::CalculateFitness(Candidate *candidate )
@@ -101,10 +185,19 @@ void StringEvolver::CalculateFitness(Candidate *candidate )
 	// Fitness is determined by the euclidean distance of each candidate character 
 	// from corresponding goal character
 	int distance = 0;
-	for(uint i = 0; i < mGoal.size(); ++i)
+	
+	int candidate_size = strlen(candidate->str);
+	int compare_amount = std::min(static_cast<int>(mGoal.size()), candidate_size);
+
+	for(int i = 0; i < compare_amount; ++i)
 	{
 		distance += abs(mGoal[i] - candidate->str[i]);
 	}
+
+	// Add a cost for incorrect amount of letters
+	int letter_mismatch = std::abs(static_cast<int>(mGoal.size()) - candidate_size);
+	distance += letter_mismatch * 94; 
+	
 	candidate->fitness = distance;
 }
 
