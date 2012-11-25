@@ -2,8 +2,8 @@
 #include <algorithm>
 #include <cmath>
 #include <cassert>
-//#define RANDOM_VALID_ELEMENT (rand() % 26) + 65;		// Valid ASCII code's for candidate elements
-#define RANDOM_VALID_ELEMENT (rand() % 94) + 32;		// Valid ASCII code's for candidate elements
+//#define RANDOM_VALID_ELEMENT (rand() % 26) + 65;		// Valid ASCII code's for candidate elements - uppercase letters only
+#define RANDOM_VALID_ELEMENT (rand() % 94) + 32;		// Valid ASCII code's for candidate elements - entire printable ascii set
 const int COST_PER_LETTER_MISMATCH = 94;				// Fitness cost when incorrect number of letters
 
 StringEvolver::StringEvolver(const std::string &theGoal, const uint thePopulationSize )
@@ -55,13 +55,15 @@ const std::string StringEvolver::GetFittest() const
 
 void StringEvolver::InitialisePopulation()
 {
-	int candidate_size = mGoal.length() + 1;	// Candidate size is equal to goal + 1 for null terminator
+	assert(mGoal.length() > 0);
+
+	int candidate_size = mGoal.length();	
 	// Initialise all candidates to correct size and null terminate c-strings
 	for(popIter it = mPopulation.begin(); it != mPopulation.end(); ++it)
 	{
-		it->str = new char[candidate_size];
-		it->str[candidate_size - 1] = '\0';
-		for(int i = 0; i < candidate_size-1; ++i)
+		it->str = new char[candidate_size + 1];	// Candidate size is equal to goal + 1 for null terminator
+		it->str[candidate_size] = '\0';
+		for(int i = 0; i < candidate_size; ++i)
 		{
 			it->str[i] = RANDOM_VALID_ELEMENT;
 		}
