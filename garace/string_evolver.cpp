@@ -30,7 +30,6 @@ void StringEvolver::AdvanceGeneration()
 		if((rand() % 100) < static_cast<int>(mCrossoverProbability * 100.0f))
 		{
 			PerformMultipleCrossover(&mPopulation[i], &mPopulation[i+1]);
-			CalculateFitness(&mPopulation[i]);
 		}
 	}
 
@@ -81,8 +80,7 @@ void StringEvolver::PerformCrossover(Candidate *mum, Candidate *dad)
 
 	// Crossover point is at least a quarter from end
 	const int crossover_point = rand() % (strlen(mum->str) - 1);
-	char *temp = new char[mGoal.length()];
-	temp[crossover_point + 1] = '\0';
+	char *temp = new char[crossover_point];
 
 	// Swap everything to left of crossover point between mum and dad
 	memcpy(temp, mum->str, crossover_point);

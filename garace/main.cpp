@@ -8,7 +8,7 @@ using std::cout;
 using std::endl;
 using std::cin;
 
-const char *DEFAULT_EVOLUTION_TARGET = "Hello, world.";
+const char *DEFAULT_EVOLUTION_TARGET = "Hello, world";
 const int DEFAULT_POPULATION_SIZE = 10000;
 
 int main(int argc, char *argv[])
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 		strcpy_s(string_to_evolve, str_length, DEFAULT_EVOLUTION_TARGET);
 	}
 
-	//srand(static_cast<int>( time(NULL) ));	// Seed random number generator
+	srand(static_cast<int>( time(NULL) ));	// Seed random number generator
 
 	StringEvolver evolver(string_to_evolve, population_size);
 
