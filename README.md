@@ -1,6 +1,7 @@
 String evolver
 ==============
 Author: Stuart Milne
+
 Date : November 2012
 
 ## Description
@@ -12,9 +13,10 @@ Simple single character mutation is supported.
 
 ## Usage
 The compiled executable can be invoked from the command line with two optional parameters.
-evolver <String to evolve> <Size of population to utilise>
+    
+    evolver <String to evolve> <Size of population to utilise>
 
 ### Example usage
-string_evolver "Evolve towards this string" 100000
+    string_evolver "Evolve towards this string" 100000
 
 The above example will attempt to evolve the supplied string with a population of 100,000.
