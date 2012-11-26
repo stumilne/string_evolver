@@ -6,6 +6,7 @@
 // There is no fallback in this case
 // See the comments in the constructor for how to begin addressing this limitation if it is a problem
 
+// The implementation is based on the Frank Luna timer and carries over some of the helpful commenting.
 // The performance counter operates as an incremental counter, that is it increments by 1 uniformly a specific
 // number of times per second. By querying this frequency we can determine the time-step for a single increment
 // Timing is then a case of determining the how many counts have passed in a period and multiplying this by the time-step
